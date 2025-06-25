@@ -3,7 +3,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyBuAyZ7WSG2Ga3lVwnjeB7lRUdaqHgX1Oo",
   authDomain: "shotchat-db42a.firebaseapp.com",
   projectId: "shotchat-db42a",
-  storageBucket: "shotchat-db42a.firebasestorage.app",
+  storageBucket: "shotchat-db42a.appspot.com",
   messagingSenderId: "74713162727",
   appId: "1:74713162727:web:051f7eeccedc6d109d9342",
   measurementId: "G-0B7YDXPS7P"
@@ -133,61 +133,13 @@ if (profileBtn) {
     if (user) {
       const userDoc = await db.collection('users').doc(user.uid).get();
       profileName.value = userDoc.exists && userDoc.data().name ? userDoc.data().name : '';
-      // Load user's tweets
+      // Load user's tweets using the same renderer as the main feed
       db.collection('tweets')
         .where('email', '==', user.email)
         .orderBy('created', 'desc')
         .onSnapshot(snapshot => {
-          myTweetsList.innerHTML = '';
-          snapshot.docs.forEach(doc => {
-            const tweet = doc.data();
-            let time = '';
-            if (tweet.created && tweet.created.toDate) {
-              const d = tweet.created.toDate();
-              time = `<div class='tweet-time' style='color:#657786;font-size:12px;margin-top:4px;'>${d.toLocaleString()}</div>`;
-            }
-            const div = document.createElement('div');
-            div.className = 'tweet';
-            let displayName = 'Unknown';
-    let username = '';
-    if (tweet.name && tweet.name.trim()) {
-      displayName = tweet.name;
-    }
-    if (tweet.email) {
-      username = tweet.email.split('@')[0];
-      if (displayName === 'Unknown') displayName = username;
-    }
-    // Card header with name/username left, delete right
-    const cardHeader = document.createElement('div');
-    cardHeader.style.display = 'flex';
-    cardHeader.style.justifyContent = 'space-between';
-    cardHeader.style.alignItems = 'center';
-    cardHeader.style.marginBottom = '2px';
-    cardHeader.innerHTML = `
-      <div>
-        <span class="tweet-email" style="font-weight:bold;">${displayName}</span><br>
-        <span class="tweet-username" style="font-size:12px;color:#8899a6;">@${username}</span>
-      </div>
-    `;
-    // Add delete button
-    const delBtn = document.createElement('button');
-    delBtn.textContent = 'Delete';
-    delBtn.style.background = '#e0245e';
-    delBtn.style.color = '#fff';
-    delBtn.style.border = 'none';
-    delBtn.style.borderRadius = '4px';
-    delBtn.style.padding = '4px 10px';
-    delBtn.style.cursor = 'pointer';
-    delBtn.onclick = async () => {
-      if (confirm('Delete this tweet?')) {
-        await doc.ref.delete();
-      }
-    };
-    cardHeader.appendChild(delBtn);
-    div.appendChild(cardHeader);
-    div.innerHTML += `<div class="tweet-content" style="margin-bottom:18px;">${tweet.content}</div>${time}`;
-    myTweetsList.appendChild(div);
-          });
+          // Use the same renderTweets function, but render into myTweetsList
+          renderTweets(snapshot.docs, myTweetsList);
         });
     }
   };
@@ -328,8 +280,8 @@ postTweetBtn.onclick = async () => {
   postTweetBtn.disabled = false;
 };
 // Render tweets
-function renderTweets(docs) {
-  tweetsList.innerHTML = '';
+function renderTweets(docs, targetList) {
+  targetList.innerHTML = '';
   docs.forEach(async doc => {
     const tweet = doc.data();
     const div = document.createElement('div');
@@ -365,10 +317,26 @@ function renderTweets(docs) {
     // Make name/username clickable for direct chat
     const nameHtml = `<span class="tweet-email" style="font-weight:bold;cursor:pointer;color:#1da1f2;" data-uid="${tweet.uid || ''}" data-email="${tweet.email || ''}" data-name="${displayName}" data-username="${username}">${displayName}</span>`;
     const usernameHtml = `<span class="tweet-username" style="font-size:12px;color:#8899a6;cursor:pointer;" data-uid="${tweet.uid || ''}" data-email="${tweet.email || ''}" data-name="${displayName}" data-username="${username}">@${username}</span>`;
+    // 3-dot menu for tweet owner
+    let menuHtml = '';
+    const user = auth.currentUser;
+    if (user && tweet.email === user.email) {
+      menuHtml = `
+        <div class="tweet-menu-container" style="position:relative;display:inline-block;">
+          <button class="tweet-menu-btn" title="More options" style="background:none;border:none;cursor:pointer;padding:4px 8px;font-size:20px;line-height:1;">&#8942;</button>
+          <div class="tweet-menu-dropdown" style="display:none;position:absolute;right:0;top:28px;background:#fff;border:1px solid #e1e8ed;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-radius:8px;z-index:10;min-width:120px;">
+            <button class="tweet-menu-delete" data-tweet-id="${doc.id}" style="color:#e0245e;background:none;border:none;width:100%;text-align:left;padding:10px 16px;cursor:pointer;font-size:15px;border-radius:8px 8px 0 0;">Delete</button>
+          </div>
+        </div>
+      `;
+    }
     div.innerHTML = `
-      <div style="margin-bottom:2px;">
-        ${nameHtml}<br>
-        ${usernameHtml}
+      <div style="margin-bottom:2px;display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          ${nameHtml}<br>
+          ${usernameHtml}
+        </div>
+        ${menuHtml}
       </div>
       <div class="tweet-content" style="margin-bottom:18px;">${tweet.content}</div>
       <div style="display:flex;justify-content:flex-end;align-items:center;">
@@ -385,12 +353,47 @@ function renderTweets(docs) {
         username: username
       });
     };
-    tweetsList.appendChild(div);
+    // Add menu event listeners if menu exists
+    const menuBtn = div.querySelector('.tweet-menu-btn');
+    const menuDropdown = div.querySelector('.tweet-menu-dropdown');
+    if (menuBtn && menuDropdown) {
+      menuBtn.onclick = (e) => {
+        e.stopPropagation();
+        // Hide any other open menus
+        document.querySelectorAll('.tweet-menu-dropdown').forEach(el => { if (el !== menuDropdown) el.style.display = 'none'; });
+        menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
+      };
+      // Hide menu when clicking outside
+      document.addEventListener('click', function hideMenu(ev) {
+        if (!div.contains(ev.target)) {
+          menuDropdown.style.display = 'none';
+          document.removeEventListener('click', hideMenu);
+        }
+      });
+      // Delete button in menu
+      const delBtn = div.querySelector('.tweet-menu-delete');
+      if (delBtn) {
+        delBtn.onclick = async (e) => {
+          e.stopPropagation();
+          const tweetId = e.currentTarget.getAttribute('data-tweet-id');
+          if (confirm('Delete this tweet?')) {
+            try {
+              await db.collection('tweets').doc(tweetId).delete();
+              div.remove();
+              console.log('Delete attempted for tweet id:', tweetId);
+            } catch (err) {
+              alert('Failed to delete tweet: ' + (err && err.message ? err.message : err));
+            }
+          }
+        };
+      }
+    }
+    targetList.appendChild(div);
   });
 }
 // Listen for tweets in real time (newest first)
 db.collection('tweets').orderBy('created', 'desc').onSnapshot(snapshot => {
-  renderTweets(snapshot.docs);
+  renderTweets(snapshot.docs, tweetsList);
 });
 
 // Direct chat logic
