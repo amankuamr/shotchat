@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Twitter App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- Sign In Page -->
+    <div id="signin-page" class="page">
+      <div class="modern-auth-card">
+        <div class="auth-logo-title">
+          <img src="images/logo.png" alt="Logo" class="logo" />
+          <h2 class="header-title" style="margin-bottom: 0;">ShotChat</h2>
+        </div>
+        <form id="signin-form">
+          <div class="modern-input-group">
+            <input type="email" id="signin-email" required />
+            <label for="signin-email" class="modern-input-label">Email</label>
+          </div>
+          <div class="modern-input-group">
+            <input type="password" id="signin-password" required />
+            <label for="signin-password" class="modern-input-label">Password</label>
+          </div>
+          <button type="submit">Sign In</button>
+        </form>
+        <p style="margin-top:18px;">Don't have an account? <a href="#" id="to-signup">Sign Up</a></p>
+        <div id="signin-error" class="error"></div>
+      </div>
+    </div>
+    <!-- Sign Up Page -->
+    <div id="signup-page" class="page" style="display:none;">
+      <div class="modern-auth-card">
+        <div class="auth-logo-title">
+          <img src="images/logo.png" alt="Logo" class="logo" />
+          <h2 class="header-title" style="margin-bottom: 0;">ShotChat</h2>
+        </div>
+        <form id="signup-form">
+          <div class="modern-input-group">
+            <input type="text" id="signup-name" maxlength="32" required />
+            <label for="signup-name" class="modern-input-label">Name</label>
+          </div>
+          <div class="modern-input-group">
+            <input type="email" id="signup-email" required />
+            <label for="signup-email" class="modern-input-label">Email</label>
+          </div>
+          <div class="modern-input-group">
+            <input type="password" id="signup-password" required />
+            <label for="signup-password" class="modern-input-label">Password</label>
+          </div>
+          <button type="submit">Sign Up</button>
+        </form>
+        <p style="margin-top:18px;">Already have an account? <a href="#" id="to-signin">Sign In</a></p>
+        <div id="signup-error" class="error"></div>
+      </div>
+    </div>
+    <!-- Main Feed Page -->
+    <div id="feed-page" class="page" style="display:none;">
+      <header class="modern-header">
+        <div class="header-left">
+          <img src="images/logo.png" alt="Logo" class="logo" />
+        </div>
+        <h2 class="header-title">ShotChat</h2>
+        <div class="header-right">
+          <div id="user-info" class="user-info-modern"></div>
+        </div>
+      </header>
+      <div id="tweets-list" class="modern-tweets-list"></div>
+      <!-- Modern Bottom Navigation Bar -->
+      <nav id="bottom-menu" class="modern-bottom-menu">
+        <button id="chat-btn" class="menu-btn" title="Chat">
+          <span class="material-icons">chat_bubble_outline</span>
+        </button>
+        <button id="plus-btn" class="menu-btn plus" title="Tweet">+</button>
+        <button id="profile-btn" class="menu-btn" title="Profile">
+          <span class="material-icons">person_outline</span>
+        </button>
+      </nav>
+      <div id="tweet-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <textarea id="tweet-input" maxlength="280" placeholder="What's happening?"></textarea>
+          <button id="post-tweet-btn">Tweet</button>
+          <button id="close-modal-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <!-- Profile Page -->
+    <div id="profile-page" class="page" style="display:none;">
+      <header class="modern-header">
+        <div class="header-left">
+          <button id="back-to-home" class="menu-btn" title="Home" style="background:#eee;border:none;border-radius:6px;padding:6px 14px;font-size:18px;">Home</button>
+        </div>
+        <h2 class="header-title">Profile</h2>
+        <div class="header-right">
+          <button id="logout-btn" style="background:#e0245e;color:#fff;padding:8px 16px;border:none;border-radius:6px;font-size:14px;">Logout</button>
+        </div>
+      </header>
+      <div id="profile-content">
+        <form id="profile-form">
+          <div class="modern-input-group">
+            <input type="text" id="profile-name" maxlength="32" required />
+            <label for="profile-name" class="modern-input-label">Your Name</label>
+          </div>
+          <button type="submit">Save Name</button>
+          <div id="profile-success" class="success"></div>
+        </form>
+        <h3>Your Tweets</h3>
+        <div id="my-tweets-list"></div>
+      </div>
+    </div>
+    <!-- Chat Page -->
+    <div id="chat-page" class="page" style="display:none;">
+      <header class="modern-header">
+        <div class="header-left">
+          <button id="back-from-chat" class="menu-btn" title="Back" style="background:#eee;border:none;border-radius:6px;padding:6px 14px;font-size:18px;">Back</button>
+        </div>
+        <h2 class="header-title">Chat</h2>
+        <div class="header-right"></div>
+      </header>
+      <div id="chat-profile-card" style="margin:24px 0 16px 0;"></div>
+      <div style="text-align:center;margin-top:40px;color:#657786;">Chat feature coming soon!</div>
+    </div>
+    <!-- Direct Chat Page -->
+    <div id="direct-chat-page" class="page" style="display:none;position:relative;padding-bottom:0;">
+      <header style="display: flex; align-items: center; justify-content: flex-start; gap: 12px;">
+        <button id="back-to-feed" style="background:#eee;border:none;border-radius:6px;padding:6px 14px;">Back</button>
+        <div id="direct-chat-profile">
+          <!-- User profile info will be injected here -->
+        </div>
+      </header>
+      <div class="header-spacer"></div>
+      <div id="direct-chat-messages" style="margin-top:16px;overflow-y:auto;"></div>
+      <form id="direct-chat-form" style="display:flex;gap:8px;max-width:100%;margin:0;padding:12px 8px 12px 8px;background:#fff;z-index:101;border-top:1px solid #eee;">
+        <input id="direct-chat-input" type="text" placeholder="Type a message..." style="flex:1;padding:10px;border-radius:6px;border:1px solid #ccc;" autocomplete="off" />
+        <button type="submit" style="background:#1da1f2;color:#fff;border:none;border-radius:6px;padding:0 18px;font-size:16px;">Send</button>
+      </form>
+    </div>
+  </div>
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <!-- Firebase App (the core Firebase SDK) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
