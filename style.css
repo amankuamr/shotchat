@@ -42,6 +42,30 @@ body {
   padding-bottom: 0 !important;
   overflow-y: unset !important;
   padding: 0 !important;
+  background: none !important;
+  overflow: hidden;
+}
+
+#direct-chat-messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  height: auto;
+  max-height: 100%;
+}
+
+#direct-chat-page::before {
+}
+
+#direct-chat-messages {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+
+#direct-chat-page #app,
+#direct-chat-page .page {
+  background: transparent !important;
 }
 #direct-chat-messages {
   display: flex;
@@ -76,18 +100,64 @@ body {
   left: 0;
   right: 0;
   width: 100vw;
-  max-width: none;
-  margin: 0;
+  max-width: 400px;
+  margin: 0 auto;
   padding: 12px 8px 12px 8px;
   background: #fff;
   z-index: 999;
   border-top: 1px solid #eee;
   box-sizing: border-box;
 }
+#direct-chat-form .modern-input-group {
+  position: relative;
+  width: 100%;
+  margin-bottom: 0;
+}
 #direct-chat-form input[type="text"] {
-  flex: 1 1 auto;
-  min-width: 0;
-  margin-right: 0;
+  width: 100%;
+  display: block;
+  font-size: 17px;
+  padding: 18px 14px 10px 14px;
+  border: 2px solid #ccd6dd;
+  border-radius: 12px;
+  background: #f5f8fa;
+  color: #222;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
+  font-weight: 500;
+  height: 48px;
+  box-shadow: 0 2px 8px rgba(29,161,242,0.08);
+}
+#direct-chat-form input[type="text"]:focus {
+  border-color: #1da1f2;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(29,161,242,0.13);
+}
+#direct-chat-form .modern-input-label {
+  position: absolute;
+  left: 16px;
+  top: 18px;
+  color: #8899a6;
+  font-size: 16px;
+  pointer-events: none;
+  background: transparent;
+  transition: all 0.22s cubic-bezier(.4,0,.2,1);
+  padding: 0 4px;
+}
+#direct-chat-form input[type="text"]:focus + .modern-input-label,
+#direct-chat-form input[type="text"]:not(:placeholder-shown) + .modern-input-label {
+  top: 2px;
+  left: 12px;
+  font-size: 13px;
+  color: #1da1f2;
+  background: #fff;
+  padding: 0 4px;
+}
+#direct-chat-form input[type="text"]:focus {
+  border-color: #1da1f2;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(29,161,242,0.10);
 }
 #direct-chat-form button[type="submit"] {
   flex: 0 0 auto;
@@ -679,4 +749,41 @@ header {
   color: #1da1f2;
   background: #fff;
   padding: 0 4px;
+}
+
+/* Themed Back Button and Send Button for Direct Chat */
+#back-to-feed.themed-back-btn {
+  background: #1da1f2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 18px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(29,161,242,0.10);
+}
+#back-to-feed.themed-back-btn:hover {
+  background: #0d8ddb;
+}
+#direct-chat-form button[type="submit"] {
+  background: #1da1f2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0 22px;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(29,161,242,0.10);
+  height: 48px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#direct-chat-form button[type="submit"]:hover {
+  background: #0d8ddb;
 }

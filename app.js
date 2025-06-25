@@ -407,6 +407,10 @@ async function openDirectChat(user) {
   } catch {}
   // Show direct chat page
   showPage(directChatPage);
+  // Always scroll to bottom when opening direct chat
+  setTimeout(() => {
+    if (directChatMessages) directChatMessages.scrollTop = directChatMessages.scrollHeight;
+  }, 100);
   // Show profile info as a card
   // Try to fetch latest name from users collection
   let profileName = user.name;
@@ -420,10 +424,11 @@ async function openDirectChat(user) {
     }
   } catch {}
   directChatProfile.innerHTML = `
-    <div style="background:#fff;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.08);padding:12px 18px 10px 18px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;border:1px solid #e1e8ed;">
-      <span style="font-weight:bold;font-size:16px;">${profileName}</span>
-      <span style="font-size:13px;color:#8899a6;">@${profileUsername}</span>
-      <span style="font-size:12px;color:#bbb;">${user.email}</span>
+    <div style="display: flex; justify-content: flex-end; align-items: center; width: 100%;">
+      <div style="text-align: right;">
+        <span style="font-weight:bold;font-size:16px;">${profileName}</span><br>
+        <span style="font-size:13px;color:#8899a6;">@${profileUsername}</span>
+      </div>
     </div>
   `;
   // Chat ID: always use sorted emails
@@ -454,7 +459,18 @@ async function openDirectChat(user) {
         msgDiv.innerHTML = `<div style="font-size:14px;">${msg.text}</div><div style="font-size:11px;color:#999;text-align:right;">${msg.created && msg.created.toDate ? msg.created.toDate().toLocaleString() : ''}</div>`;
         directChatMessages.appendChild(msgDiv);
       });
-      directChatMessages.scrollTop = directChatMessages.scrollHeight;
+      // Robust scroll-to-bottom after rendering
+      function scrollToBottom(attempts = 0) {
+        directChatMessages.scrollTop = directChatMessages.scrollHeight;
+        if (attempts < 10) {
+          requestAnimationFrame(() => {
+            if (directChatMessages.scrollTop !== directChatMessages.scrollHeight && directChatMessages.scrollHeight > 0) {
+              scrollToBottom(attempts + 1);
+            }
+          });
+        }
+      }
+      scrollToBottom();
     });
 }
 // Send message
@@ -464,6 +480,7 @@ if (directChatForm) {
     const me = auth.currentUser;
     if (!me || !currentDirectChat) return;
     const text = directChatInput.value.trim();
+    directChatInput.value = '';
     if (!text) return;
     // Get recipient email from the current direct chat context
     const recipientEmail = window.currentDirectChatRecipientEmail;
