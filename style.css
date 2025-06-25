@@ -117,7 +117,7 @@ body {
   width: 100%;
   display: block;
   font-size: 17px;
-  padding: 18px 14px 10px 14px;
+  padding: 0 16px;
   border: 2px solid #ccd6dd;
   border-radius: 12px;
   background: #f5f8fa;
@@ -126,8 +126,29 @@ body {
   box-sizing: border-box;
   transition: border-color 0.22s, box-shadow 0.22s, background 0.22s;
   font-weight: 500;
-  height: 48px;
+  height: 44px;
   box-shadow: 0 2px 8px rgba(29,161,242,0.08);
+}
+
+#direct-chat-form button[type="submit"] {
+  height: 44px;
+  border-radius: 12px;
+  padding: 0 22px;
+  font-size: 17px;
+  font-weight: 500;
+  background: #1da1f2;
+  color: #fff;
+  border: none;
+  margin-left: 8px;
+  box-shadow: 0 2px 8px rgba(29,161,242,0.10);
+  transition: background 0.18s, box-shadow 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+#direct-chat-form button[type="submit"]:hover {
+  background: #0d8ddb;
 }
 #direct-chat-form input[type="text"]:focus {
   border-color: #1da1f2;
@@ -144,9 +165,11 @@ body {
   background: transparent;
   transition: all 0.22s cubic-bezier(.4,0,.2,1);
   padding: 0 4px;
+  z-index: 2;
 }
 #direct-chat-form input[type="text"]:focus + .modern-input-label,
-#direct-chat-form input[type="text"]:not(:placeholder-shown) + .modern-input-label {
+#direct-chat-form input[type="text"]:not(:placeholder-shown) + .modern-input-label,
+#direct-chat-form input[type="text"][value]:not([value=""]) + .modern-input-label {
   top: 2px;
   left: 12px;
   font-size: 13px;
